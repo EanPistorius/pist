@@ -5,7 +5,7 @@ export default function RSVPModal({ close }: {close: () => void}) {
     const [email, setEmail] = useState("");
     const [nickname, setName] = useState("");
     const [consent, setConsent] = useState(false);
-    const [option, setOption] = useState("");
+    const [attending, setAttendance] = useState("");
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -21,12 +21,12 @@ export default function RSVPModal({ close }: {close: () => void}) {
         const timeoutId = setTimeout(() => controller.abort(), 5000);
         try {
             setError(null);
-            const res = await fetch("http://127.0.0.1:8000/api/subscribe", {
+            const res = await fetch("http://127.0.0.1:8000/subscribe", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, nickname, consent, option }),
+                body: JSON.stringify({ email, nickname, attending, consent }),
                 signal: controller.signal,
             })
             clearTimeout(timeoutId);
@@ -82,8 +82,8 @@ export default function RSVPModal({ close }: {close: () => void}) {
                             <label htmlFor="consent" className="text-gray">Ek gee toestemming om 'n e-pos na my adres te stuur</label>
                     </div>
                     <select
-                        value={option}
-                        onChange={(e) => setOption(e.target.value)}
+                        value={attending}
+                        onChange={(e) => setAttendance(e.target.value)}
                         className="text-gray bg-gray-800 w-full border border-gray-500 rounded-lg p-3"
                         aria-placeholder="Sal U Bywoon?"
                         required

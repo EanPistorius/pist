@@ -9,7 +9,7 @@ export default function Hero() {
     return (
         <>
         <section className="text-center items-center relative h-[80vh] justify-center py-24 px-6"></section>
-        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0"></div>
 
         <div className="relative text-center px-6">
             <h1 className="text-7xl font-bold mb-6 ">Uitnodiging vir Pistorius troue</h1>

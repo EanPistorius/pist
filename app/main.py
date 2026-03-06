@@ -1,21 +1,23 @@
 #author: Ean Pistorius @ tomcatendeavours
 from fastapi import FastAPI, Depends
-from app import SubscriberService, EmailService, settings, SessionLocal, Base, engine
-from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+
+from app import SubscriberRequest, SessionLocal, Base, engine
+from app.services import SubscriberService
 from fastapi.middleware.cors import CORSMiddleware
 
-
-email_service = EmailService(
-    sub_service=SubscriberService(SessionLocal()),
-    email_repo=EmailRepository(SessionLocal())
-)
-
-engine = create_engine(
-        settings.DATABASE_URL,
-        pool_pre_ping=True
-        )
-
 app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
+
+app.add_middleware(CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://192.168.1.92:3000"
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db():
     db = SessionLocal()
@@ -25,32 +27,18 @@ def get_db():
         db.close()
 
 @app.post("/subscribe")
-def subscribe(data: SubscriberService):
+def subscribe(data: SubscriberRequest, db: Session = Depends(get_db)):
     
-
-    result = email_service.submit(
-        email=data.email,
-        nickname=data.nickname,
-        attending=data.attending,
-        consent=data.consent
+    subscriber = SubscriberService.subscribe(db,
+        data.email,
+        data.nickname,
+        data.attending,
+        data.consent
     )
-    return {"status": "ok"}
+
+    return {"status": "ok", "message": "RSVP suksesvol ontvang. / RSVP successfully received."}
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
-@app.on_event("startup")
-def startup_event():
-    # Create tables if they don't exist
-    Base.metadata.create_all(bind=engine)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000"
-    ],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)

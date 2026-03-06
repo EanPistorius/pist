@@ -1,23 +1,31 @@
 #author Ean Pistorius @ tomcat endeavours
-from .email_service import EmailService
-from app.repositories import SubscriberRepository
-from fastapi import HTTPException
+
+from app.repositories import SubscriberRepository, EmailRepository
+from app.core import logger
+from app.models import Subscriber
+from sqlalchemy.orm import Session
+
 
 class SubscriberService:
-    def __init__(self, repository: SubscriberRepository):
-        self.repository = repository
-        self.email_service = EmailService()
+       @staticmethod
+       def subscribe(db: Session, email: str, nickname: str, attending: str, consent: bool) -> Subscriber:
+        try:
+            subscriber = SubscriberRepository.get_by_email(db, email)
+            if subscriber:
+                logger.info("subscriber already exists")
+                subscriber.nickname = nickname
+                subscriber.attending = attending
+                subscriber.consent = consent
+            else:
+                logger.info("subscriber does not exist, creating new subscriber")
+                subscriber = SubscriberRepository.create(db, email, nickname, attending, consent)
+            EmailRepository.create_email_record(db, subscriber)
+            db.commit()
+            db.refresh(subscriber)
+            logger.info("subscriber data committed")
+            return subscriber
+        except Exception as e:
+            db.rollback()
+            logger.error("Error occurred while subscribing:")
+            raise e
 
-    async def subscribe(self, email: str, nickname: str, option: str, consent: bool):
-        if not consent:
-            raise Exception("Benodig toestemming. / Consent required")
-        existing = self.repository.get_by_email(email)
-        if existing:
-            self.repository.update_subscriber(email=existing.email, nickname=nickname, option=option, consent=consent)
-            raise HTTPException(
-                status_code=200,
-                detail="Gas databasis opgedateer. / Guest database updated.")
-
-        subscriber = self.repository.create_subscriber(email, nickname, option, consent)
-        await self.email_service.submit(email, nickname, option, consent)
-        return subscriber

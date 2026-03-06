@@ -1,29 +1,22 @@
 #author Ean Pistorius @ tomcat endeavours
 
 from sqlalchemy.orm import Session  
-from app import Subscriber
+from app.models import Subscriber
+
 
 class SubscriberRepository:
-    def __init__(self, db: Session):
-        self.db = db
+    @staticmethod
+    def get_by_email(db: Session, email: str):
+        return db.query(Subscriber).filter(Subscriber.email == email).first()
 
-    def get_by_email(self, email: str):
-        return self.db.query(Subscriber).filter(Subscriber.email == email).first()
-
-    def create_subscriber(self, email: str, nickname: str, consent: bool, option: str):
+    def create(db: Session, email: str, nickname: str, attending: str, consent: bool):
         subscriber = Subscriber(
                 email = email,
                 nickname = nickname,
-                consent = consent,
-                option = option
+                attending = attending,
+                consent = consent
                 )
     
-        self.db.add(subscriber)
-        self.db.commit()
-        self.db.refresh(subscriber)
+        db.add(subscriber)
         return subscriber
-    def update_subscriber(self, subscriber: Subscriber):
-        self.db.add(subscriber)
-        self.db.commit()
-        self.db.refresh(subscriber)
-        return subscriber
+
