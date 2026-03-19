@@ -16,4 +16,4 @@ class Subscriber(Base):
     created_at = Column(DateTime, default = datetime.utcnow)
     updated_at = Column(DateTime, default = datetime.utcnow, onupdate = datetime.utcnow)
 
-    emails = relationship("Email", back_populates="subscriber")
+    emails = relationship("Email", back_populates="subscriber_email_address")
