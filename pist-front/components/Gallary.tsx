@@ -9,7 +9,7 @@ export default function Gallary() {
                 <Image src="/images/01a36257329235889d95ee9c85573dca6367ebaca3.jpg" alt="Gallary Image 2" width={400} height={300} className="rounded-lg object-cover" />
                 <Image src="/images/carlee_2449_00021.JPG" alt="Gallary Image 5" width={400} height={300} className="rounded-lg object-cover" />
                 <Image src="/images/carlee_2449_00032.JPG" alt="Gallary Image 6" width={400} height={300} className="rounded-lg object-cover" />
-                <Image src="/images/EAN_4828_00040.JPG" alt="Gallary Image 8" width={400} height={300} className="rounded-lg object-cover" />
+                <Image src="/images/hero_kerk.JPG" alt="Gallary Image 8" width={400} height={300} className="rounded-lg object-cover" />
                 <Image src="/images/carlee_2449_00016.JPG" alt="Gallary Image 9" width={400} height={300} className="rounded-lg object-cover" />
             </div>
         </section>
