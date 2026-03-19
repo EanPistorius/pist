@@ -1,0 +1,51 @@
+services:
+
+  api:
+    build: pist-back
+    ports:
+      - 8000:8000
+    depends_on:
+      - proxy
+      - db
+  
+  ddnsd:
+    build: ddnsd
+    depends_on:
+      - api
+    restart: always
+    env_file:
+      - .env
+  
+
+  ui:
+    build: pist-front
+    depends_on:
+      - proxy
+
+  
+
+  db:
+    image: postgres:16
+    container_name: pist-db
+    restart: always
+    environment:
+      POSTGRES_USER: pistorius_user
+      POSTGRES_PASSWORD: Pistorius1234
+      POSTGRES_DB: pistorius
+    ports:
+      - "5432:5432"
+    volumes:
+      - pist-db-data:/var/lib/postgresql/data
+
+  proxy:
+    image: nginx:stable-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - /opt/pist/proxy/nginx:/etc/nginx
+
+
+volumes:
+  pist-db-data: {}
+
+
