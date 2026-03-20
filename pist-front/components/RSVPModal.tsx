@@ -21,7 +21,7 @@ export default function RSVPModal({ close }: {close: () => void}) {
         const timeoutId = setTimeout(() => controller.abort(), 5000);
         try {
             setError(null);
-            const res = await fetch("http://127.0.0.1:8000/subscribe", {
+            const res = await fetch("http://192.168.1.92:8000/subscribe", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
