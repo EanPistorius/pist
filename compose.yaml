@@ -9,7 +9,7 @@ services:
       - db
   
   ddnsd:
-    build: ddnsd
+    build: route53-ddns
     depends_on:
       - api
     restart: always
