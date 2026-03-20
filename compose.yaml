@@ -10,12 +10,7 @@ services:
   
   ddnsd:
     build: route53-ddns
-    depends_on:
-      - api
-    restart: always
-    env_file:
-      - .env
-  
+    restart: always 
 
   ui:
     build: pist-front
