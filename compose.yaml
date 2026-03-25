@@ -8,14 +8,9 @@ services:
       - proxy
       - db
   
-  ddnsd:
-    build: ddnsd
-    depends_on:
-      - api
-    restart: always
-    env_file:
-      - .env
-  
+  route53-ddns:
+    build: route53-ddns
+    restart: always 
 
   ui:
     build: pist-front
