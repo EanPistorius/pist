@@ -5,7 +5,6 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - proxy
       - db
   
   ddnsd:
@@ -14,11 +13,9 @@ services:
 
   ui:
     build: pist-front
-    depends_on:
-      - proxy
+
 
   
-
   db:
     image: postgres:16
     container_name: pist-db
@@ -37,7 +34,11 @@ services:
     ports:
       - "80:80"
     volumes:
-      - /opt/pist/proxy/nginx:/etc/nginx
+      - ./proxy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./proxy/nginx/html/:/usr/share/nginx/html/:ro
+    depends_on:
+      - api
+      - ui
 
 
 volumes:
