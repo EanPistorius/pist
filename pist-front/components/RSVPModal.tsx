@@ -1,121 +1,214 @@
-"use client"
-import { useState, useEffect } from "react"
+"use client";
 
-export default function RSVPModal({ close }: {close: () => void}) {
-    const [email, setEmail] = useState("");
-    const [nickname, setName] = useState("");
-    const [consent, setConsent] = useState(false);
-    const [attending, setAttendance] = useState("");
-    const [error, setError] = useState<string | null>(null);
+import { useEffect, useState } from "react";
 
-    useEffect(() => {
-        document.body.style.overflow = "hidden";
-        return () => {
-            document.body.style.overflow = "unset";
-        };
-    }, []);
+interface RSVPModalProps {
+  close: () => void;
+}
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        try {
-            setError(null);
-            const res = await fetch("api/subscribe", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, nickname, attending, consent }),
-                signal: controller.signal,
-            })
-            clearTimeout(timeoutId);
-            if (!res.ok) {
-                const errorData = await res.json()
-                throw new Error(errorData.detail)
-            }
 
-            const errorData = await res.json()
-            close();
-        } catch (error: any) {
-            if ((error as Error).name === "AbortError") {
-                alert("Die versoek het te lank geneem. Probeer asseblief weer op 'n ander geleentheid.");
-                return;
-            }
-            //409 is 'n konflik, beteken die e-pos is reeds geregistreer
-            if (error.message){
-                setError(error.message);
-                return;
-            }
-            console.error("Error met RSVP:", error);
-        }
+export default function RSVPModal({
+  close,
+}: RSVPModalProps) {
+  const [email, setEmail] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [consent, setConsent] = useState(false);
+  const [attending, setAttending] = useState("");
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const resetForm = () => {
+  setEmail("");
+  setNickname("");
+  setAttending("");
+  setConsent(false);
+  setError("");
+  };
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
+
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ) {
+    e.preventDefault();
+
+    setLoading(true);
+    setError("");
+
+    const controller = new AbortController();
+
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 5000);
+
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          nickname,
+          attending,
+          consent,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Kon nie RSVP stoor nie."
+        );
+      }
+
+      setSuccess(true);
+
+      setTimeout(() => {
+        close();
+      }, 1500);
+    } catch (err: any) {
+      if (err.name === "AbortError") {
+        setError(
+          "Die versoek het te lank geneem. Probeer asseblief weer."
+        );
+      } else {
+        setError(
+          err.message ||
+            "Iets het verkeerd geloop."
+        );
+      }
+    } finally {
+      setLoading(false);
     }
+  }
 
-    return (
+  return (
+    <div className="card rsvp-modal">
+      <div className="">
+        <h2 className="mb-1">
+          RSVP 💍
+        </h2>
 
-        <div className="fixed inset-0 flex items-center justify-center bg-black/90">
-            <div className="text-gray bg-gray-800 p-8 rounded-xl w-full max-w-md">
-                <h2 className="text-3xl font-bold mb-6">RSVP</h2>
+        <p className="text-muted mb-3">
+          Laat weet ons asseblief of u die
+          troue sal bywoon.
+        </p>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <input
-                        type="email"
-                        placeholder="U e-pos adres"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="text-gray w-full border border-gray-500 rounded-lg p-3"
-                        required
-                    />
-                    <input
-                        type="text"
-                        placeholder="U Noemnaam"
-                        value={nickname}
-                        onChange={(e) => setName(e.target.value)}
-                        className="text-gray w-full border border-gray-500 rounded-lg p-3"
-                        required
-                    />
-                    <div className="flex items-center">
-                            <input type="checkbox" id="consent" className="mr-2" required 
-                            checked={consent}
-                            onChange={(e) => setConsent(e.target.checked)} />
-                            <label htmlFor="consent" className="text-gray">Ek gee toestemming om 'n e-pos na my adres te stuur</label>
-                    </div>
-                    <select
-                        value={attending}
-                        onChange={(e) => setAttendance(e.target.value)}
-                        className="text-gray bg-gray-800 w-full border border-gray-500 rounded-lg p-3"
-                        aria-placeholder="Sal U Bywoon?"
-                        required
-                    >
-                        <option className="text-gray" value="" disabled>Sal U bywoon?</option>
-                        <option className="text-gray" value="yes">Ja ek kom</option>
-                        <option className="text-gray" value="no">Nee ek kom nie</option>
-                    </select>
-                    <div className="flex justify-between">
-                        <button
-                            type="button"
-                            onClick={close}
-                            className="border text-gray px-4 py-2 rounded-lg hover:text-white hover:bg-gray-400 transition"
-                        >
-                            Kanselleer
-                        </button>
-                        
-                        {error && (
-                            <p className="text-red mt-2">
-                            {error}
-                            </p>
-                        )}
-                        <button
-                            type="submit"
-                            className="border bg-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        {success ? (
+          <div className="text-center py-6">
+            <h3>Dankie!</h3>
 
-                        >
-                            Stuur RSVP
-                        </button>
-                    </div>
-                </form>
+            <p className="text-muted mt-2">
+              Jou RSVP is suksesvol ontvang.
+            </p>
+          </div>
+        ) : (
+          <form
+            onSubmit={handleSubmit}
+            >
+            <input
+              type="email"
+              placeholder="E-pos adres"
+              value={email}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
+              required
+              className="input"
+            />
+
+            <input
+              type="text"
+              placeholder="Naam"
+              value={nickname}
+              onChange={(e) =>
+                setNickname(e.target.value)
+              }
+              required
+              className="input"
+            />
+
+            <select
+              value={attending}
+              onChange={(e) =>
+                setAttending(e.target.value)
+              }
+              required
+              className="input"
+            >
+              <option value="">
+                Sal u bywoon?
+              </option>
+
+              <option value="yes">
+                Ja, ek kom graag
+              </option>
+
+              <option value="no">
+                Ongelukkig nie
+              </option>
+            </select>
+
+            <label className="text-muted">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) =>
+                  setConsent(
+                    e.target.checked
+                  )
+                }
+                required
+              />
+
+              <span>
+                Ek gee toestemming dat julle
+                my mag kontak op hierdie epos adres.
+              </span>
+            </label>
+
+            {error && (
+              <p className="text-red-500 text-sm">
+                {error}
+              </p>
+            )}
+
+            <div className="flex justify-end gap-4 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  resetForm();
+                }}
+                className="btn btn-outline"
+
+              >
+                Kanselleer
+              </button>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn btn-primary"
+              >
+                {loading
+                  ? "Stuur..."
+                  : "Stuur RSVP"}
+              </button>
             </div>
-        </div>
-    );
+          </form>
+        )}
+      </div>
+    </div>
+  );
 }

@@ -1,26 +1,425 @@
-@import "tailwindcss";
+/* =========================
+   GLOBAL RESET
+========================= */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html, body {
+  height: 100%;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #ffffff;
+  color: #111;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.input {
+  width: 100%;
+  padding: 0.9rem 1rem;
+
+  border: 1px solid #dcdcdc;
+  border-radius: 12px;
+
+  background: white;
+
+  font-size: 0.95rem;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.input:focus {
+  outline: none;
+  border-color: #111;
+}
+
+.btn-outline {
+  background: white;
+  border: 1px solid #dcdcdc;
+  color: #111;
+}
+
+.btn-outline:hover {
+  background: #f7f7f7;
+}
+
+/* =========================
+   TYPOGRAPHY SYSTEM
+========================= */
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* Muted text */
+.text-muted {
+  color: #888;
+  font-size: 0.9rem;
+  padding-bottom: 2rem;
+}
+
+/* =========================
+   BUTTON SYSTEM
+========================= */
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
+}
+
+.btn-primary {
+  background: #111;
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.85;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #ddd;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 18px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+}
+
+/* =========================
+   LAYOUT HELPERS
+========================= */
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.section {
+  padding: 3rem 1.5rem;
+}
+
+.center {
+  text-align: center;
+}
+
+/* Bottom Navigation */
+
+.navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 2000;
+
+  backdrop-filter: blur(20px);
+
+  background: rgba(255,255,255,0.85);
+
+  border-top: 1px solid #e5e5e5;
+
+  padding: 0.75rem;
+}
+
+.navbar-container {
+  max-width: 800px;
+
+  margin: 0 auto;
+
+  display: flex;
+
+  justify-content: space-around;
+
+  gap: 0.5rem;
+}
+
+.nav-link {
+  padding: 0.75rem 1rem;
+
+  border-radius: 16px;
+
+  text-decoration: none;
+
+  color: #777;
+
+  font-size: 0.85rem;
+
+  font-weight: 500;
+
+  transition: all 0.25s ease;
+}
+
+.nav-link:hover {
+  color: #111;
+}
+
+.nav-link-active {
+  background: #f1f1f1;
+
+  color: #111;
+
+  font-weight: 600;
+}
+
+.page {
+  padding-bottom: 100px;
+}
+
+main {
+  padding-bottom: 100px;
+}
+
+/* =========================
+   RSVP Modal
+
+========================= */
+.rsvp-modal {
+  width: 100%;
+  max-width: 500px;
+  font-size: 2rem;
+  margin: auto;
+  margin-top: 16rem;
+  border-radius: 30px;
+  padding: 4rem;
+}
+
+.rsvp-overlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 3rem;
+
+  background: rgba(0, 0, 0, 0.7);
+
+
+  z-index: 1000;
+}
+
+/* =========================
+   TIMELINE STYLING
+========================= */
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  position: relative;
+}
+
+/* Vertical line */
+.timeline::before {
+  content: "";
+  position: absolute;
+
+  left: 70px;
+  top: 0;
+  bottom: 0;
+
+  width: 2px;
+  background: #e5e5e5;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 80px 20px 1fr;
+  align-items: start;
+  gap: 1rem;
+}
+
+/* Time */
+.timeline-time {
+  font-weight: 600;
+  color: #111;
+  font-size: 0.95rem;
+}
+
+/* Dot */
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #111;
+  margin-top: 6px;
+  z-index: 2;
+}
+
+/* Card override */
+.timeline-card {
+  padding: 1.25rem;
+}
+
+/* =========================
+   GALLERY STYLING
+========================= */
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+/* Card wrapper */
+.gallery-card {
+  position: relative;
+  width: 100%;
+
+  aspect-ratio: 4 / 3; /* 🔥 belangrik */
+
+  overflow: hidden;
+  border-radius: 18px;
+
+  background: #f5f5f5;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+
+  cursor: pointer;
+}
+
+/* Hover effect */
+.gallery-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.12);
+}
+
+/* Image fill */
+.gallery-img {
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+/* Zoom on hover */
+.gallery-card:hover .gallery-img {
+  transform: scale(1.08);
+}
+/* =========================
+   LIGHTBOX OVERLAY
+========================= */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+}
+
+/* Container */
+.lightbox-content {
+  position: relative;
+
+  width: 90%;
+  height: 85%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Image wrapper */
+.lightbox-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Close button */
+.lightbox-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  background: white;
+  border: none;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+
+  font-size: 1.2rem;
+
+  cursor: pointer;
+}
+
+/* Navigation buttons */
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  background: rgba(255,255,255,0.9);
+  border: none;
+
+  width: 45px;
+  height: 45px;
+
+  border-radius: 50%;
+
+  font-size: 1.5rem;
+
+  cursor: pointer;
+}
+
+.lightbox-prev {
+  left: 10px;
+}
+
+.lightbox-next {
+  right: 10px;
+}
+
+/* Smooth hover feel */
+.lightbox-prev:hover,
+.lightbox-next:hover,
+.lightbox-close:hover {
+  background: white;
 }
