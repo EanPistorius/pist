@@ -1,15 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-interface RSVPModalProps {
-  close: () => void;
-}
-
-
-export default function RSVPModal({
-  close,
-}: RSVPModalProps) {
+export default function RSVPForm() {
   const [email, setEmail] = useState("");
   const [nickname, setNickname] = useState("");
   const [consent, setConsent] = useState(false);
@@ -18,20 +11,15 @@ export default function RSVPModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const resetForm = () => {
-  setEmail("");
-  setNickname("");
-  setAttending("");
-  setConsent(false);
-  setError("");
-  };
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
 
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, []);
+  const resetForm = () => {
+    setEmail("");
+    setNickname("");
+    setAttending("");
+    setConsent(false);
+    setError("");
+    setSuccess(false);
+  };
 
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
@@ -73,10 +61,7 @@ export default function RSVPModal({
       }
 
       setSuccess(true);
-
-      setTimeout(() => {
-        close();
-      }, 1500);
+      resetForm();
     } catch (err: any) {
       if (err.name === "AbortError") {
         setError(
@@ -95,120 +80,105 @@ export default function RSVPModal({
 
   return (
     <div className="card rsvp-modal">
-      <div className="">
-        <h2 className="mb-1">
-          RSVP 💍
-        </h2>
+      <h2 className="mb-1">RSVP 💍</h2>
 
-        <p className="text-muted mb-3">
-          Laat weet ons asseblief of u die
-          troue sal bywoon.
-        </p>
+      <p className="text-muted mb-3">
+        Laat weet ons asseblief of u die troue sal bywoon.
+      </p>
 
-        {success ? (
-          <div className="text-center py-6">
-            <h3>Dankie!</h3>
+      {success && (
+        <div className="mb-4 rounded-xl p-4">
+          <h3>Dankie!</h3>
+          <p className="text-muted">
+            Jou RSVP is suksesvol ontvang.
+          </p>
+        </div>
+      )}
 
-            <p className="text-muted mt-2">
-              Jou RSVP is suksesvol ontvang.
-            </p>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            >
-            <input
-              type="email"
-              placeholder="E-pos adres"
-              value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
-              required
-              className="input"
-            />
+      <form className="rsvp-modal" onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="E-pos adres"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="input"
+        />
 
-            <input
-              type="text"
-              placeholder="Naam"
-              value={nickname}
-              onChange={(e) =>
-                setNickname(e.target.value)
-              }
-              required
-              className="input"
-            />
+        <input
+          type="text"
+          placeholder="Naam"
+          value={nickname}
+          onChange={(e) =>
+            setNickname(e.target.value)
+          }
+          required
+          className="input"
+        />
 
-            <select
-              value={attending}
-              onChange={(e) =>
-                setAttending(e.target.value)
-              }
-              required
-              className="input"
-            >
-              <option value="">
-                Sal u bywoon?
-              </option>
+        <select
+          value={attending}
+          onChange={(e) =>
+            setAttending(e.target.value)
+          }
+          required
+          className="input"
+        >
+          <option value="">
+            Sal u bywoon?
+          </option>
 
-              <option value="yes">
-                Ja, ek kom graag
-              </option>
+          <option value="yes">
+            Ja, ek kom graag
+          </option>
 
-              <option value="no">
-                Ongelukkig nie
-              </option>
-            </select>
+          <option value="no">
+            Ongelukkig nie
+          </option>
+        </select>
 
-            <label className="text-muted">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(e) =>
-                  setConsent(
-                    e.target.checked
-                  )
-                }
-                required
-              />
+        <label className="flex items-start gap-3 text-muted">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) =>
+              setConsent(e.target.checked)
+            }
+            required
+          />
 
-              <span>
-                Ek gee toestemming dat julle
-                my mag kontak op hierdie epos adres.
-              </span>
-            </label>
+          <span>
+            Ek gee toestemming dat julle my
+            mag kontak op hierdie e-pos adres.
+          </span>
+        </label>
 
-            {error && (
-              <p className="text-red-500 text-sm">
-                {error}
-              </p>
-            )}
-
-            <div className="flex justify-end gap-4 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  resetForm();
-                }}
-                className="btn btn-outline"
-
-              >
-                Kanselleer
-              </button>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn btn-primary"
-              >
-                {loading
-                  ? "Stuur..."
-                  : "Stuur RSVP"}
-              </button>
-            </div>
-          </form>
+        {error && (
+          <p className="text-red-500 text-sm">
+            {error}
+          </p>
         )}
-      </div>
+
+        <div className="flex justify-end gap-4 pt-4">
+          <button
+            type="button"
+            onClick={resetForm}
+            className="btn btn-outline"
+          >
+            Maak skoon
+          </button>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn btn-primary"
+          >
+            {loading
+              ? "Stuur..."
+              : "Stuur RSVP"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
