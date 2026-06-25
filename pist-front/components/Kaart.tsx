@@ -49,12 +49,23 @@ export default function Kaart() {
     ? `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`
     : 'https://demotiles.maplibre.org/style.json';
 
-  const openDirections = (lat: number, lng: number) => {
+const openDirections = (lat: number, lng: number) => {
+  const destination = `${lat},${lng}`;
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  if (isIOS) {
     window.open(
-      `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
-      '_blank'
+      `https://maps.apple.com/?daddr=${destination}`,
+      "_blank"
     );
-  };
+  } else {
+    window.open(
+      `https://www.google.com/maps/dir/?api=1&destination=${destination}`,
+      "_blank"
+    );
+  }
+};
 
   return (
     <main className="container">
@@ -80,7 +91,7 @@ export default function Kaart() {
             initialViewState={{
               latitude: venue.lat,
               longitude: venue.lng,
-              zoom: 11,
+              zoom: 7,
             }}
             mapStyle={mapStyle}
             style={{
